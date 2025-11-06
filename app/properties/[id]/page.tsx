@@ -179,46 +179,45 @@ export default function PropertyDetailPage() {
     <main className="min-h-screen bg-background">
       <Navigation />
 
-      {/* Hero Image Gallery */}
 <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-    {/* Gambar utama */}
-    <div className="md:col-span-4">
+  {/* Gambar utama */}
+  <div className="w-full">
+    <img
+      src={property.images?.[activeImage] || "/placeholder.svg"}
+      alt={property.title}
+      className="w-full h-[300px] md:h-[400px] object-cover rounded-xl shadow-md"
+    />
+  </div>
+
+  {/* Thumbnail – tampil di semua ukuran layar */}
+  <div className="flex md:flex-row flex-row md:mt-4 gap-3 overflow-x-auto mt-4 pb-2 scrollbar-hide">
+    {property.images?.slice(0, 5).map((img: string, idx: number) => (
       <img
-        src={property.images?.[activeImage] || "/placeholder.svg"}
-        alt={property.title}
-        className="w-full h-[400px] object-cover rounded-xl shadow-md"
+        key={idx}
+        src={img}
+        alt={`Foto ${idx + 1}`}
+        className={`w-24 h-24 object-cover rounded-lg border cursor-pointer transition-all ${
+          activeImage === idx ? "ring-2 ring-primary" : "opacity-90 hover:opacity-100"
+        }`}
+        onClick={() => setActiveImage(idx)}
       />
-    </div>
+    ))}
 
-    {/* Thumbnail */}
-    <div className="hidden md:flex md:flex-col gap-3">
-      {property.images?.slice(1, 4).map((img: string, idx: number) => (
+    {property.images?.length > 5 && (
+      <div
+        className="relative w-24 h-24 rounded-lg overflow-hidden cursor-pointer flex-shrink-0"
+        onClick={() => setShowGallery(true)}
+      >
         <img
-          key={idx}
-          src={img}
-          alt={`Foto ${idx + 1}`}
-          className="w-full h-[120px] object-cover rounded-lg border hover:opacity-80 transition cursor-pointer"
-          onClick={() => setActiveImage(idx + 1)}
+          src={property.images[5]}
+          alt="Lihat Semua"
+          className="w-full h-full object-cover"
         />
-      ))}
-
-      {property.images?.length > 4 && (
-        <div
-          className="relative w-full h-[120px] rounded-lg overflow-hidden cursor-pointer"
-          onClick={() => setShowGallery(true)}
-        >
-          <img
-            src={property.images[4]}
-            alt="Lihat Semua"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-semibold">
-            Lihat Semua
-          </div>
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-semibold text-sm">
+          +{property.images.length - 5} Foto
         </div>
-      )}
-    </div>
+      </div>
+    )}
   </div>
 
   {/* Modal Gallery */}
@@ -248,7 +247,8 @@ export default function PropertyDetailPage() {
       </div>
     </div>
   )}
-      </section>
+</section>
+
 
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
