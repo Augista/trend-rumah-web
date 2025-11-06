@@ -43,10 +43,121 @@ const propertyDetails: Record<number, any> = {
       "/comfortable-family-home.jpg",
       "/comfortable-family-home.jpg",
     ],
-    description: "Rumah nyaman untuk keluarga dengan akses mudah ke sekolah, rumah sakit, dan pusat perbelanjaan.",
+    description:
+      "Rumah nyaman untuk keluarga dengan akses mudah ke sekolah, rumah sakit, dan pusat perbelanjaan.",
     features: ["Taman depan", "Garasi 1 mobil", "Dapur tertutup", "Ruang keluarga luas", "Lokasi tenang"],
   },
-}
+  3: {
+    title: "Apartemen Pusat Kota",
+    price: "Rp 800.000.000",
+    location: "Jambangan, Surabaya",
+    type: "Apartemen",
+    size: 120,
+    bedrooms: 2,
+    bathrooms: 2,
+    image: "/modern-city-apartment.png",
+    images: [
+      "/modern-city-apartment.png",
+      "/modern-city-apartment.png",
+      "/modern-city-apartment.png",
+    ],
+    description:
+      "Apartemen modern di pusat kota dengan akses strategis ke perkantoran, mall, dan transportasi umum.",
+    features: ["Keamanan 24 jam", "Kolam renang", "Gym", "Parkir luas", "Akses lift pribadi"],
+  },
+  4: {
+    title: "Ruko Soekarno-Hatta",
+    price: "Rp 1.200.000.000",
+    location: "Tegalsari, Surabaya",
+    type: "Ruko",
+    size: 180,
+    bedrooms: 0,
+    bathrooms: 2,
+    image: "/traditional-shophouse.png",
+    images: [
+      "/traditional-shophouse.png",
+      "/traditional-shophouse.png",
+      "/traditional-shophouse.png",
+    ],
+    description:
+      "Ruko strategis cocok untuk usaha dan kantor, terletak di area ramai dengan akses kendaraan mudah.",
+    features: ["Lantai 2", "Parkir depan ruko", "Toilet di setiap lantai", "Dekat area komersial"],
+  },
+  5: {
+    title: "Rumah Mewah Ketintang",
+    price: "Rp 3.000.000.000",
+    location: "Genteng, Surabaya",
+    type: "Rumah",
+    size: 300,
+    bedrooms: 5,
+    bathrooms: 4,
+    image: "/luxury-home.png",
+    images: [
+      "/luxury-home.png",
+      "/luxury-home.png",
+      "/luxury-home.png",
+      "/luxury-home.png",
+    ],
+    description:
+      "Rumah mewah dengan desain elegan dan taman luas, berada di lingkungan eksklusif dan nyaman.",
+    features: ["Kolam renang", "Garasi 2 mobil", "Ruang tamu luas", "Teras belakang", "Keamanan 24 jam"],
+  },
+  6: {
+    title: "Ruko Bisnis Tanjungsari",
+    price: "Rp 950.000.000",
+    location: "Tegalsari, Surabaya",
+    type: "Ruko",
+    size: 150,
+    bedrooms: 0,
+    bathrooms: 2,
+    image: "/business-shop.jpg",
+    images: [
+      "/business-shop.jpg",
+      "/business-shop.jpg",
+      "/business-shop.jpg",
+    ],
+    description:
+      "Ruko bisnis siap pakai di kawasan komersial Tanjungsari, cocok untuk usaha retail maupun kantor.",
+    features: ["Akses utama jalan besar", "Toilet dalam", "Listrik 2200W", "Dekat pusat kota"],
+  },
+  7: {
+    title: "Apartemen Modern Surabaya",
+    price: "Rp 600.000.000",
+    location: "Bulak, Surabaya",
+    type: "Apartemen",
+    size: 100,
+    bedrooms: 2,
+    bathrooms: 1,
+    image: "/modern-apartment-living.png",
+    images: [
+      "/modern-apartment-living.png",
+      "/modern-apartment-living.png",
+      "/modern-apartment-living.png",
+    ],
+    description:
+      "Apartemen bergaya modern dengan fasilitas lengkap dan pemandangan kota yang menawan.",
+    features: ["Gym", "Kolam renang", "Parkir aman", "Keamanan 24 jam", "Dekat pantai Kenjeran"],
+  },
+  8: {
+    title: "Rumah Asri Gubeng",
+    price: "Rp 1.500.000.000",
+    location: "Gubeng, Surabaya",
+    type: "Rumah",
+    size: 200,
+    bedrooms: 4,
+    bathrooms: 3,
+    image: "/nice-home.jpg",
+    images: [
+      "/nice-home.jpg",
+      "/nice-home.jpg",
+      "/nice-home.jpg",
+    ],
+    description:
+      "Rumah asri dengan lingkungan hijau dan udara sejuk, cocok untuk keluarga yang mengutamakan kenyamanan.",
+    features: ["Halaman luas", "Garasi 2 mobil", "Teras depan", "Ruang makan besar", "Lokasi strategis"],
+  },
+};
+
 
 
 export default function PropertyDetailPage() {
@@ -137,7 +248,7 @@ export default function PropertyDetailPage() {
       </div>
     </div>
   )}
-</section>
+      </section>
 
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
@@ -232,8 +343,8 @@ export default function PropertyDetailPage() {
             }
             className="w-full py-3 bg-primary text-primary-foreground rounded-lg hover:bg-accent transition-colors font-semibold mb-3"
           >
-            Hubungi Agen
-          </button>
+                Hubungi Agen
+              </button>
 
           <button
             onClick={() =>
@@ -244,8 +355,8 @@ export default function PropertyDetailPage() {
             }
             className="w-full py-3 border border-primary text-primary rounded-lg hover:bg-primary/10 transition-colors font-semibold mb-6"
           >
-            Ajukan Penawaran
-          </button>
+                Ajukan Penawaran
+              </button>
 
 
               <Link href="/search" className="block text-center text-primary hover:text-accent text-sm font-medium">

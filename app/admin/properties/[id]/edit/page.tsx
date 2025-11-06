@@ -61,7 +61,7 @@ export default function EditPropertyPage({ params }: { params: { id: string } })
           setImagePreview(property.featured_image_url)
         }
       } catch (error) {
-        console.error(" Fetch error:", error)
+        console.error("[v0] Fetch error:", error)
       } finally {
         setFetching(false)
       }
@@ -121,7 +121,7 @@ export default function EditPropertyPage({ params }: { params: { id: string } })
 
       router.push("/admin/dashboard")
     } catch (error) {
-      console.error(" Submit error:", error)
+      console.error("[v0] Submit error:", error)
       alert("Gagal update properti")
     } finally {
       setLoading(false)

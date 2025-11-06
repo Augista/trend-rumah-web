@@ -4,6 +4,7 @@ import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
 import { ChevronRight, MapPin } from "lucide-react"
 import Link from "next/link"
+// import { createServerSupabaseClient } from "@/lib/supabase/server"
 
 const properties = [
   {
@@ -28,7 +29,7 @@ const properties = [
     id: 3,
     title: "Apartemen Pusat Kota",
     location: "Jambangan",
-    price: "Rp 800 JT",
+    price: "Rp 800J",
     type: "Apartemen",
     size: "120 m²",
     image: "/modern-city-apartment.png",
@@ -55,7 +56,7 @@ const properties = [
     id: 6,
     title: "Ruko Bisnis Tanjungsari",
     location: "Tegalsari",
-    price: "Rp 950 JT",
+    price: "Rp 950J",
     type: "Ruko",
     size: "150 m²",
     image: "/business-shop.jpg",
@@ -64,7 +65,7 @@ const properties = [
     id: 7,
     title: "Apartemen Modern Surabaya",
     location: "Bulak",
-    price: "Rp 600 JT",
+    price: "Rp 600J",
     type: "Apartemen",
     size: "100 m²",
     image: "/modern-apartment-living.png",
@@ -80,7 +81,110 @@ const properties = [
   },
 ]
 
+// async function getProperties() {
+//   try {
+//     const supabase = await createServerSupabaseClient()
+//     const { data: properties, error } = await supabase
+//       .from("properties")
+//       .select("*")
+//       .eq("status", "published")
+//       .order("created_at", { ascending: false })
+
+//     if (error) {
+//       console.log("[v0] Fetch properties error:", error.message)
+//       return []
+//     }
+
+//     return properties || []
+//   } catch (error) {
+//     console.log("[v0] Get properties error:", error)
+//     return []
+//   }
+// }
+
 export default function PropertiesPage() {
+  // const dbProperties = await getProperties()
+
+  // Fallback to hardcoded data if no Supabase properties
+  const properties =
+    // // dbProperties.length > 0
+    // //   ? dbProperties
+    //   : 
+    [
+          {
+            id: 1,
+            title: "Rumah Modern Darmo",
+            location: "Darmo",
+            price: "Rp 2.5M",
+            type: "Rumah",
+            size: "250 m²",
+            image: "/modern-house.png",
+          },
+          {
+            id: 2,
+            title: "Rumah Nyaman Dinoyo",
+            location: "Dinoyo",
+            price: "Rp 1.2M",
+            type: "Rumah",
+            size: "180 m²",
+            image: "/comfortable-home.jpg",
+          },
+          {
+            id: 3,
+            title: "Apartemen Pusat Kota",
+            location: "Jambangan",
+            price: "Rp 800J",
+            type: "Apartemen",
+            size: "120 m²",
+            image: "/modern-city-apartment.png",
+          },
+          {
+            id: 4,
+            title: "Ruko Soekarno-Hatta",
+            location: "Tegalsari",
+            price: "Rp 1.2M",
+            type: "Ruko",
+            size: "180 m²",
+            image: "/traditional-shophouse.png",
+          },
+          {
+            id: 5,
+            title: "Rumah Mewah Ketintang",
+            location: "Genteng",
+            price: "Rp 3M",
+            type: "Rumah",
+            size: "300 m²",
+            image: "/luxury-home.png",
+          },
+          {
+            id: 6,
+            title: "Ruko Bisnis Tanjungsari",
+            location: "Tegalsari",
+            price: "Rp 950J",
+            type: "Ruko",
+            size: "150 m²",
+            image: "/business-shop.jpg",
+          },
+          {
+            id: 7,
+            title: "Apartemen Modern Surabaya",
+            location: "Bulak",
+            price: "Rp 600J",
+            type: "Apartemen",
+            size: "100 m²",
+            image: "/modern-apartment-living.png",
+          },
+          {
+            id: 8,
+            title: "Rumah Asri Gubeng",
+            location: "Gubeng",
+            price: "Rp 1.5M",
+            type: "Rumah",
+            size: "200 m²",
+            image: "/nice-home.jpg",
+          },
+        ]
+
   return (
     <main className="min-h-screen bg-background">
       <Navigation />
@@ -117,7 +221,7 @@ export default function PropertiesPage() {
                     {property.title}
                   </h3>
                   <div className="flex items-center text-muted-foreground text-sm mb-3">
-                    <MapPin className="w-4 h-4 mr-1 shrink-0" />
+                    <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
                     <span className="truncate">{property.location}</span>
                   </div>
 

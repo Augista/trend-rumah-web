@@ -36,15 +36,14 @@ export default function AdminDashboardPage() {
       const data = await response.json()
       setProperties(data)
     } catch (error) {
-      console.error(" Fetch error:", error)
+      console.error("[v0] Fetch error:", error)
     } finally {
       setLoading(false)
     }
   }
 
   const handleLogout = () => {
-    document.cookie = "admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-    router.push("/admin/login")
+    router.push("/admin/dashboard")
   }
 
   const handleDelete = async (id: number) => {
@@ -58,7 +57,7 @@ export default function AdminDashboardPage() {
         setProperties(properties.filter((p) => p.id !== id))
       }
     } catch (error) {
-      console.error(" Delete error:", error)
+      console.error("[v0] Delete error:", error)
     }
   }
 
@@ -117,7 +116,7 @@ export default function AdminDashboardPage() {
                 key={property.id}
                 className="bg-card rounded-lg overflow-hidden hover:shadow-md transition-shadow flex flex-col md:flex-row"
               >
-                <div className="w-full md:w-48 h-40 md:h-32 shrink-0 bg-muted overflow-hidden">
+                <div className="w-full md:w-48 h-40 md:h-32 flex-shrink-0 bg-muted overflow-hidden">
                   <img
                     src={property.featured_image_url || "/placeholder.svg"}
                     alt={property.title}

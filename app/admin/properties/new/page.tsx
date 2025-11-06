@@ -1,21 +1,20 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Upload } from "lucide-react"
 
 const districts = ["Darmo", "Dinoyo", "Tegalsari", "Jambangan", "Wonokromo", "Sukolilo", "Tambaksari", "Genteng"]
-
 const propertyTypes = ["Rumah", "Apartemen", "Ruko", "Tanah"]
 
 export default function NewPropertyPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [imagePreview, setImagePreview] = useState<string>("")
   const [formData, setFormData] = useState({
     title: "",
@@ -41,19 +40,41 @@ export default function NewPropertyPage() {
     }))
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const imageUrl = event.target?.result as string
-        setImagePreview(imageUrl)
-        setFormData((prev) => ({
-          ...prev,
-          featured_image_url: imageUrl,
-        }))
+    if (!file) return
+
+    // Show preview
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      setImagePreview(event.target?.result as string)
+    }
+    reader.readAsDataURL(file)
+
+    setUploadingImage(true)
+    try {
+      const formDataToSend = new FormData()
+      formDataToSend.append("file", file)
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formDataToSend,
+      })
+
+      if (!response.ok) {
+        throw new Error("Upload failed")
       }
-      reader.readAsDataURL(file)
+
+      const { url } = await response.json()
+      setFormData((prev) => ({
+        ...prev,
+        featured_image_url: url,
+      }))
+    } catch (error) {
+      console.error("[v0] Upload error:", error)
+      alert("Gagal upload gambar")
+    } finally {
+      setUploadingImage(false)
     }
   }
 
@@ -79,13 +100,14 @@ export default function NewPropertyPage() {
       })
 
       if (!response.ok) {
-        throw new Error("Failed to create property")
+        const error = await response.json()
+        throw new Error(error.error || "Failed to create property")
       }
 
       router.push("/admin/dashboard")
     } catch (error) {
-      console.error(" Submit error:", error)
-      alert("Gagal menambah properti")
+      console.error("[v0] Submit error:", error)
+      alert("Gagal menambah properti: " + (error instanceof Error ? error.message : "Unknown error"))
     } finally {
       setLoading(false)
     }
@@ -111,7 +133,13 @@ export default function NewPropertyPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-center w-full">
                 <label className="w-full border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors">
-                  <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    disabled={uploadingImage}
+                    className="hidden"
+                  />
                   {imagePreview ? (
                     <div>
                       <img
@@ -119,10 +147,13 @@ export default function NewPropertyPage() {
                         alt="Preview"
                         className="h-48 mx-auto rounded-lg mb-4"
                       />
-                      <p className="text-sm text-muted-foreground">Klik untuk mengganti foto</p>
+                      <p className="text-sm text-muted-foreground">
+                        {uploadingImage ? "Uploading..." : "Klik untuk mengganti foto"}
+                      </p>
                     </div>
                   ) : (
                     <div>
+                      <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
                       <p className="text-lg font-medium text-foreground mb-2">Upload Foto Properti</p>
                       <p className="text-sm text-muted-foreground">Drag and drop atau klik untuk pilih</p>
                     </div>
@@ -305,7 +336,7 @@ export default function NewPropertyPage() {
             </Link>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || uploadingImage}
               className="flex-1 px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-accent transition-colors font-medium disabled:opacity-50"
             >
               {loading ? "Menyimpan..." : "Simpan Properti"}
