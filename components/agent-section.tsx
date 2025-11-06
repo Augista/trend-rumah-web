@@ -18,7 +18,7 @@ export default function AgentSection() {
         {/* Main Content - Two Column Layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-12">
           {/* Left: Image */}
-          <div className="order-2 md:order-1">
+          <div className="order-1 md:order-1">
             <div className="relative aspect-square overflow-hidden rounded-lg shadow-xl">
               <img
                 src="/OMANTO1.jpeg"

@@ -138,7 +138,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="relative h-96 md:h-[800px] overflow-hidden">
+      <section className="relative h-96 max-md:h-[400px] md:h-[800px] overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
