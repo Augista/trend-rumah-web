@@ -104,9 +104,9 @@ ${formData.message}
                   <Phone className="w-6 h-6 text-primary" />
                   <h3 className="font-semibold">Telepon</h3>
                 </div>
-                <p className="text-sm text-muted-foreground mb-4">Hubungi kami langsung melalui telepon</p>
+                <p className="text-sm text-muted-foreground mb-4">Hubungi kami langsung melalui Whatsapp</p>
                 <a
-                  href="tel:+628123456789"
+                  href="https://wa.me/+6281235749112"
                   className="inline-flex items-center gap-2 px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium"
                 >
                   <Phone className="w-4 h-4" />

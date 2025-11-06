@@ -28,7 +28,7 @@ const properties = [
     id: 3,
     title: "Apartemen Pusat Kota",
     location: "Jambangan",
-    price: "Rp 800J",
+    price: "Rp 800 JT",
     type: "Apartemen",
     size: "120 m²",
     image: "/modern-city-apartment.png",
@@ -55,7 +55,7 @@ const properties = [
     id: 6,
     title: "Ruko Bisnis Tanjungsari",
     location: "Tegalsari",
-    price: "Rp 950J",
+    price: "Rp 950 JT",
     type: "Ruko",
     size: "150 m²",
     image: "/business-shop.jpg",
@@ -64,7 +64,7 @@ const properties = [
     id: 7,
     title: "Apartemen Modern Surabaya",
     location: "Bulak",
-    price: "Rp 600J",
+    price: "Rp 600 JT",
     type: "Apartemen",
     size: "100 m²",
     image: "/modern-apartment-living.png",
@@ -117,7 +117,7 @@ export default function PropertiesPage() {
                     {property.title}
                   </h3>
                   <div className="flex items-center text-muted-foreground text-sm mb-3">
-                    <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                    <MapPin className="w-4 h-4 mr-1 shrink-0" />
                     <span className="truncate">{property.location}</span>
                   </div>
 

@@ -117,7 +117,7 @@ export default function AdminDashboardPage() {
                 key={property.id}
                 className="bg-card rounded-lg overflow-hidden hover:shadow-md transition-shadow flex flex-col md:flex-row"
               >
-                <div className="w-full md:w-48 h-40 md:h-32 flex-shrink-0 bg-muted overflow-hidden">
+                <div className="w-full md:w-48 h-40 md:h-32 shrink-0 bg-muted overflow-hidden">
                   <img
                     src={property.featured_image_url || "/placeholder.svg"}
                     alt={property.title}

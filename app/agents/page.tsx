@@ -4,12 +4,12 @@ import Footer from "@/components/footer"
 const allAgents = [
   {
     id: 1,
-    name: "Mr. Anto Wijaya",
+    name: "Mr. Anto ",
     title: "Senior Real Estate Agent",
     image: "/professional-real-estate-agent-man-in-suit.jpg",
     description:
-      "Dengan pengalaman lebih dari 10 tahun di industri real estate, Mr. Anto Wijaya adalah ahli terpercaya Anda dalam menemukan properti impian. Spesialisasi di Surabaya pusat dengan track record luar biasa dan kepuasan pelanggan yang tinggi.",
-    phone: "+62 812 3456 7890",
+      "Dengan pengalaman lebih dari 10 tahun di industri real estate, Kuswanto adalah ahli terpercaya Anda dalam menemukan properti impian. Spesialisasi di Surabaya pusat dengan track record luar biasa dan kepuasan pelanggan yang tinggi.",
+    phone: "+6281235749112",
     email: "anto@propertisurabaya.com",
     specialties: ["Residensial Luxury", "Properti Komersial", "Investasi"],
   }

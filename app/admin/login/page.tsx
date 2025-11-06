@@ -46,12 +46,12 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-accent/5 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-linear-to-br from-primary/5 to-accent/5 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
             <Link href="/" className="inline-block">
-              <h1 className="text-3xl font-serif font-bold text-primary">KuswantoProperty</h1>
+              <h1 className="text-3xl font-serif font-bold text-primary">Trend Rumah</h1>
             </Link>
             <p className="text-muted-foreground mt-2">Admin Dashboard</p>
           </div>
@@ -59,7 +59,7 @@ export default function AdminLoginPage() {
           <form onSubmit={handleLogin} className="space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3 items-start">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
                 <p className="text-red-700 text-sm">{error}</p>
               </div>
             )}
@@ -68,7 +68,7 @@ export default function AdminLoginPage() {
               <label className="block text-sm font-medium text-foreground mb-2">Email</label>
               <Input
                 type="email"
-                placeholder="admin@kuswantoproperty.com"
+                placeholder="admin@Trend Rumah.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -98,7 +98,7 @@ export default function AdminLoginPage() {
           <div className="mt-6 pt-6 border-t border-border text-center text-sm text-muted-foreground">
             <p>Demo credentials for testing:</p>
             <p className="font-mono text-xs mt-2 bg-muted p-3 rounded">
-              Email: admin@kuswantoproperty.com
+              Email: admin@Trend Rumah.com
               <br />
               Password: admin123
             </p>

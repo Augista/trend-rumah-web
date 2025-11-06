@@ -1,5 +1,6 @@
 "use client"
-
+import { useEffect, useState } from "react"
+import { X } from "lucide-react"
 import { useParams } from "next/navigation"
 import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
@@ -16,6 +17,14 @@ const propertyDetails: Record<number, any> = {
     bedrooms: 4,
     bathrooms: 3,
     image: "/modern-luxury-home.jpg",
+    images: [
+      "/modern-luxury-home.jpg",
+      "/modern-luxury-home.jpg",
+      "/modern-luxury-home.jpg",
+      "/modern-luxury-home.jpg",
+      "/modern-luxury-home.jpg",
+      "/modern-luxury-home.jpg",
+    ],
     description:
       "Rumah mewah dengan design modern minimalis, dilengkapi fasilitas premium dan lokasi strategis di pusat bisnis Surabaya.",
     features: ["Taman luas", "Garasi 2 mobil", "Kolam renang", "Ruang tamu luas", "Dapur modern", "Smart home system"],
@@ -29,25 +38,107 @@ const propertyDetails: Record<number, any> = {
     bedrooms: 3,
     bathrooms: 2,
     image: "/comfortable-family-home.jpg",
+    images: [
+      "/comfortable-family-home.jpg",
+      "/comfortable-family-home.jpg",
+      "/comfortable-family-home.jpg",
+    ],
     description: "Rumah nyaman untuk keluarga dengan akses mudah ke sekolah, rumah sakit, dan pusat perbelanjaan.",
     features: ["Taman depan", "Garasi 1 mobil", "Dapur tertutup", "Ruang keluarga luas", "Lokasi tenang"],
   },
 }
 
+
 export default function PropertyDetailPage() {
   const params = useParams()
+  const [showGallery, setShowGallery] = useState(false)
+  const [activeImage, setActiveImage] = useState(0)
+  const [isClient, setIsClient] = useState(false)
   const propertyId = Number.parseInt(params.id as string)
   const property = propertyDetails[propertyId] || propertyDetails[1]
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (!isClient) return null // cegah render sebelum client siap
+
 
   return (
     <main className="min-h-screen bg-background">
       <Navigation />
 
-      {/* Hero Image */}
-      <section className="relative h-96 overflow-hidden">
-        <img src={property.image || "/placeholder.svg"} alt={property.title} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/30"></div>
-      </section>
+      {/* Hero Image Gallery */}
+<section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+    {/* Gambar utama */}
+    <div className="md:col-span-4">
+      <img
+        src={property.images?.[activeImage] || "/placeholder.svg"}
+        alt={property.title}
+        className="w-full h-[400px] object-cover rounded-xl shadow-md"
+      />
+    </div>
+
+    {/* Thumbnail */}
+    <div className="hidden md:flex md:flex-col gap-3">
+      {property.images?.slice(1, 4).map((img: string, idx: number) => (
+        <img
+          key={idx}
+          src={img}
+          alt={`Foto ${idx + 1}`}
+          className="w-full h-[120px] object-cover rounded-lg border hover:opacity-80 transition cursor-pointer"
+          onClick={() => setActiveImage(idx + 1)}
+        />
+      ))}
+
+      {property.images?.length > 4 && (
+        <div
+          className="relative w-full h-[120px] rounded-lg overflow-hidden cursor-pointer"
+          onClick={() => setShowGallery(true)}
+        >
+          <img
+            src={property.images[4]}
+            alt="Lihat Semua"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-semibold">
+            Lihat Semua
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+
+  {/* Modal Gallery */}
+  {showGallery && (
+    <div className="fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center">
+      <button
+        onClick={() => setShowGallery(false)}
+        className="absolute top-4 right-4 text-white hover:text-gray-300"
+      >
+        <X className="w-8 h-8" />
+      </button>
+      <div className="max-w-5xl w-full px-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {property.images?.map((img: string, idx: number) => (
+            <img
+              key={idx}
+              src={img}
+              alt={`Foto ${idx + 1}`}
+              className="w-full h-56 object-cover rounded-lg border hover:opacity-80 cursor-pointer"
+              onClick={() => {
+                setActiveImage(idx)
+                setShowGallery(false)
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  )}
+</section>
+
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -117,28 +208,45 @@ export default function PropertyDetailPage() {
 
               <div className="space-y-4 mb-6">
                 <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                  <Phone className="w-5 h-5 text-primary mt-1 shrink-0" />
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Telepon</p>
-                    <p className="font-semibold text-foreground">+62 31 2345 6789</p>
+                    <p className="text-sm text-muted-foreground mb-1">Whatsapp</p>
+                    <p className="font-semibold text-foreground">+6281235749112</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                  <Mail className="w-5 h-5 text-primary mt-1 shrink-0" />
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Email</p>
-                    <p className="font-semibold text-foreground">info@properti-surabaya.com</p>
+                    <p className="text-sm text-muted-foreground mb-1">Instagram</p>
+                    <p className="font-semibold text-foreground">kuswanto_trendrumahsurabaya</p>
                   </div>
                 </div>
               </div>
 
-              <button className="w-full py-3 bg-primary text-primary-foreground rounded-lg hover:bg-accent transition-colors font-semibold mb-3">
-                Hubungi Agen
-              </button>
+            <button
+            onClick={() =>
+              window.open(
+                "https://wa.me/+6281235749112?text=Halo%20saya%20tertarik%20dengan%20properti%20ini",
+                "_blank"
+              )
+            }
+            className="w-full py-3 bg-primary text-primary-foreground rounded-lg hover:bg-accent transition-colors font-semibold mb-3"
+          >
+            Hubungi Agen
+          </button>
 
-              <button className="w-full py-3 border border-primary text-primary rounded-lg hover:bg-primary/10 transition-colors font-semibold mb-6">
-                Ajukan Penawaran
-              </button>
+          <button
+            onClick={() =>
+              window.open(
+                "https://wa.me/+6281235749112?text=Halo%20saya%20ingin%20mengajukan%20penawaran%20untuk%20properti%20ini",
+                "_blank"
+              )
+            }
+            className="w-full py-3 border border-primary text-primary rounded-lg hover:bg-primary/10 transition-colors font-semibold mb-6"
+          >
+            Ajukan Penawaran
+          </button>
+
 
               <Link href="/search" className="block text-center text-primary hover:text-accent text-sm font-medium">
                 ← Kembali ke Pencarian
