@@ -1,108 +1,103 @@
-// import { createServerSupabaseClient } from "@/lib/supabase/server"
-// import { type NextRequest, NextResponse } from "next/server"
+import { supabase } from "@/lib/db"
+import { supabaseAdmin } from "@/lib/supabase/admin"
+import { cookies } from "next/headers"
+import { type NextRequest, NextResponse } from "next/server"
 
-// export async function GET(request: NextRequest) {
-//   try {
-//     const supabase = await createServerSupabaseClient()
-//     const { searchParams } = new URL(request.url)
-//     const district = searchParams.get("district")
-//     const propertyType = searchParams.get("type")
+// 🔹 GET — ambil semua properti
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const district = searchParams.get("district")
+    const propertyType = searchParams.get("type")
 
-//     let query = supabase
-//       .from("properties")
-//       .select("*")
-//       .eq("listing_status", "available")
-//       .order("created_at", { ascending: false })
+    let query = supabaseAdmin
+      .from("properties")
+      .select("*")
+      .eq("listing_status", "available")
+      .order("created_at", { ascending: false })
 
-//     if (district) {
-//       query = query.eq("district", district)
-//     }
+    if (district) query = query.eq("district", district)
+    if (propertyType) query = query.eq("property_type", propertyType)
 
-//     if (propertyType) {
-//       query = query.eq("property_type", propertyType)
-//     }
+    const { data, error } = await query
 
-//     const { data, error } = await query
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
 
-//     if (error) {
-//       return NextResponse.json({ error: error.message }, { status: 500 })
-//     }
+    return NextResponse.json(data)
+  } catch (error) {
+    console.error("[v0] Get properties error:", error)
+    return NextResponse.json({ error: "Server error" }, { status: 500 })
+  }
+}
 
-//     return NextResponse.json(data)
-//   } catch (error) {
-//     console.error("[v0] Get properties error:", error)
-//     return NextResponse.json({ error: "Server error" }, { status: 500 })
-//   }
-// }
+// 🔹 POST — tambah properti baru
+export async function POST(request: NextRequest) {
+  try {
+    const cookieStore = cookies()
+    const session = (await cookieStore).get("admin_session")?.value
 
-// export async function POST(request: NextRequest) {
-//   try {
-//     const supabase = await createServerSupabaseClient()
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
 
-//     const {
-//       data: { user },
-//     } = await supabase.auth.getUser()
+    let admin
+    try {
+      admin = JSON.parse(session)
+    } catch {
+      return NextResponse.json({ error: "Invalid session" }, { status: 401 })
+    }
 
-//     if (!user) {
-//       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-//     }
+    const { data: adminCheck, error: adminError } = await supabaseAdmin
+      .from("admin_users")
+      .select("id, email")
+      .eq("id", admin.id)
+      .single()
 
-//     // Check if user is admin
-//     const { data: userProfile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
+    if (adminError || !adminCheck) {
+      return NextResponse.json({ error: "Admin access required" }, { status: 403 })
+    }
 
-//     if (!userProfile?.is_admin) {
-//       return NextResponse.json({ error: "Admin access required" }, { status: 403 })
-//     }
+    const body = await request.json()
 
-//     const body = await request.json()
+    const { data, error } = await supabaseAdmin
+      .from("properties")
+      .insert([
+        {
+          admin_id: adminCheck.id, // ✅ gunakan ini
+          title: body.title,
+          description: body.description,
+          location: body.location,
+          district: body.district,
+          property_type: body.property_type,
+          price: Number(body.price),
+          size_sqm: body.size_sqm ? Number(body.size_sqm) : null,
+          bedrooms: body.bedrooms ? Number(body.bedrooms) : null,
+          bathrooms: body.bathrooms ? Number(body.bathrooms) : null,
+          featured_image_url: body.featured_image_url,
+          gallery_images: body.gallery_images || [],
+          amenities: Array.isArray(body.amenities)
+            ? body.amenities
+            : body.amenities
+            ? [body.amenities]
+            : [],
+          contact_phone: body.contact_phone,
+          contact_email: body.contact_email,
+          listing_status: "available",
+        },
+      ])
+      .select()
 
-//     const {
-//       title,
-//       description,
-//       location,
-//       district,
-//       property_type,
-//       price,
-//       size_sqm,
-//       bedrooms,
-//       bathrooms,
-//       featured_image_url,
-//       amenities,
-//       contact_phone,
-//       contact_email,
-//     } = body
+    if (error) {
+      console.error("Insert property error:", error)
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
 
-//     const { data, error } = await supabase
-//       .from("properties")
-//       .insert([
-//         {
-//           admin_id: user.id,
-//           title,
-//           description,
-//           location,
-//           district,
-//           property_type,
-//           price: Number(price),
-//           size_sqm: size_sqm ? Number(size_sqm) : null,
-//           bedrooms: bedrooms ? Number(bedrooms) : null,
-//           bathrooms: bathrooms ? Number(bathrooms) : null,
-//           featured_image_url,
-//           amenities: Array.isArray(amenities) ? amenities : [amenities],
-//           contact_phone,
-//           contact_email,
-//         },
-//       ])
-//       .select()
+    return NextResponse.json(data[0], { status: 201 })
+  } catch (error) {
+    console.error("[v0] Create property error:", error)
+    return NextResponse.json({ error: "Server error" }, { status: 500 })
+  }
+}
 
-//     if (error) {
-//       return NextResponse.json({ error: error.message }, { status: 400 })
-//     }
-
-//     return NextResponse.json(data[0], { status: 201 })
-//   } catch (error) {
-//     console.error("[v0] Create property error:", error)
-//     return NextResponse.json({ error: "Server error" }, { status: 500 })
-//   }
-// }
-
-export {}

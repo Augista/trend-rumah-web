@@ -1,29 +1,18 @@
-import { neon } from "@neondatabase/serverless";
 
-const sql = neon(process.env.NEON_DATABASE_URL!);
+import { createClient } from "@supabase/supabase-js"
 
-export { sql };
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
-export async function query(text: string, params?: any[]) {
-  try {
-    // Jika ada params, ganti placeholder $1, $2, dst dengan nilai yang di-escape
-    let queryText = text;
+export async function query(sql: string, params?: any[]) {
+  const { data, error } = await supabase.rpc("exec_sql", { sql, params })
 
-    if (params && params.length > 0) {
-      params.forEach((param, index) => {
-        const value =
-          typeof param === "string"
-            ? `'${param.replace(/'/g, "''")}'` // escape tanda kutip tunggal
-            : param;
-        queryText = queryText.replace(`$${index + 1}`, String(value));
-      });
-    }
-
-    // Jalankan query mentah
-    const result = await sql.unsafe(queryText);
-    return result;
-  } catch (error) {
-    console.error("❌ Database query error:", error);
-    throw error;
+  if (error) {
+    console.error("Supabase query error:", error)
+    throw error
   }
+
+  return data
 }

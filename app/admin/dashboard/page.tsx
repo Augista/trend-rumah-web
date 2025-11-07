@@ -24,6 +24,7 @@ export default function AdminDashboardPage() {
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchProperties()
@@ -31,19 +32,27 @@ export default function AdminDashboardPage() {
 
   const fetchProperties = async () => {
     try {
+      setError(null)
       const response = await fetch("/api/properties")
-      if (!response.ok) throw new Error("Failed to fetch")
+      if (!response.ok) {
+        if (response.status === 500) {
+          setError("Database not initialized. Please run the migration script first.")
+          return
+        }
+        throw new Error("Failed to fetch")
+      }
       const data = await response.json()
-      setProperties(data)
+      setProperties(data || [])
     } catch (error) {
       console.error("[v0] Fetch error:", error)
+      setError("Failed to load properties. Please check your database setup.")
     } finally {
       setLoading(false)
     }
   }
 
   const handleLogout = () => {
-    router.push("/admin/dashboard")
+    router.push("/")
   }
 
   const handleDelete = async (id: number) => {
@@ -66,6 +75,30 @@ export default function AdminDashboardPage() {
       p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.location.toLowerCase().includes(searchTerm.toLowerCase()),
   )
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="bg-primary text-primary-foreground">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <h1 className="text-3xl font-serif font-bold">Admin Dashboard</h1>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+            <p className="text-yellow-800 mb-4">{error}</p>
+            <a
+              href="/setup-db"
+              className="inline-block px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            >
+              Go to Setup Instructions →
+            </a>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">

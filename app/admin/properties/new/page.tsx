@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ArrowLeft, Upload } from "lucide-react"
+import { ArrowLeft, Upload, X } from "lucide-react"
 
 const districts = ["Darmo", "Dinoyo", "Tegalsari", "Jambangan", "Wonokromo", "Sukolilo", "Tambaksari", "Genteng"]
 const propertyTypes = ["Rumah", "Apartemen", "Ruko", "Tanah"]
@@ -16,6 +16,8 @@ export default function NewPropertyPage() {
   const [loading, setLoading] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [imagePreview, setImagePreview] = useState<string>("")
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([])
+  const [galleryUrls, setGalleryUrls] = useState<string[]>([])
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -27,6 +29,7 @@ export default function NewPropertyPage() {
     bedrooms: "",
     bathrooms: "",
     featured_image_url: "",
+    gallery_images: [] as string[],
     amenities: "",
     contact_phone: "",
     contact_email: "",
@@ -40,11 +43,10 @@ export default function NewPropertyPage() {
     }))
   }
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFeaturedImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Show preview
     const reader = new FileReader()
     reader.onload = (event) => {
       setImagePreview(event.target?.result as string)
@@ -61,21 +63,79 @@ export default function NewPropertyPage() {
         body: formDataToSend,
       })
 
+      const responseData = await response.json()
+
       if (!response.ok) {
-        throw new Error("Upload failed")
+        throw new Error(responseData.error || "Upload failed")
       }
 
-      const { url } = await response.json()
       setFormData((prev) => ({
         ...prev,
-        featured_image_url: url,
+        featured_image_url: responseData.url,
       }))
+      alert("Gambar utama berhasil diupload!")
     } catch (error) {
       console.error("[v0] Upload error:", error)
-      alert("Gagal upload gambar")
+      alert(`Gagal upload gambar: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
       setUploadingImage(false)
     }
+  }
+
+  const handleGalleryImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      if (galleryUrls.length >= 10) {
+        alert("Maksimal 10 gambar untuk galeri")
+        break
+      }
+
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        setGalleryPreviews((prev) => [...prev, event.target?.result as string])
+      }
+      reader.readAsDataURL(file)
+
+      setUploadingImage(true)
+      try {
+        const formDataToSend = new FormData()
+        formDataToSend.append("file", file)
+
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formDataToSend,
+        })
+
+        const responseData = await response.json()
+
+        if (!response.ok) {
+          throw new Error(responseData.error || "Upload failed")
+        }
+
+        setGalleryUrls((prev) => [...prev, responseData.url])
+        setFormData((prev) => ({
+          ...prev,
+          gallery_images: [...prev.gallery_images, responseData.url],
+        }))
+      } catch (error) {
+        console.error("[v0] Gallery upload error:", error)
+        alert(`Gagal upload gambar galeri: ${error instanceof Error ? error.message : "Unknown error"}`)
+      } finally {
+        setUploadingImage(false)
+      }
+    }
+  }
+
+  const removeGalleryImage = (index: number) => {
+    setGalleryPreviews((prev) => prev.filter((_, i) => i !== index))
+    setGalleryUrls((prev) => prev.filter((_, i) => i !== index))
+    setFormData((prev) => ({
+      ...prev,
+      gallery_images: prev.gallery_images.filter((_, i) => i !== index),
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -96,6 +156,7 @@ export default function NewPropertyPage() {
             .split(",")
             .map((a) => a.trim())
             .filter(Boolean),
+          gallery_images: formData.gallery_images,
         }),
       })
 
@@ -127,7 +188,7 @@ export default function NewPropertyPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Image Upload */}
+          {/* Featured Image Upload */}
           <div className="bg-card rounded-lg p-6 border border-border">
             <h2 className="text-lg font-semibold mb-4">Foto Utama</h2>
             <div className="space-y-4">
@@ -136,7 +197,7 @@ export default function NewPropertyPage() {
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={handleImageChange}
+                    onChange={handleFeaturedImageChange}
                     disabled={uploadingImage}
                     className="hidden"
                   />
@@ -160,6 +221,53 @@ export default function NewPropertyPage() {
                   )}
                 </label>
               </div>
+            </div>
+          </div>
+
+          {/* Gallery Images Upload */}
+          <div className="bg-card rounded-lg p-6 border border-border">
+            <h2 className="text-lg font-semibold mb-4">Galeri Foto (Opsional - Maksimal 10 foto)</h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-center w-full">
+                <label className="w-full border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleGalleryImageChange}
+                    disabled={uploadingImage || galleryUrls.length >= 10}
+                    className="hidden"
+                  />
+                  <div>
+                    <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-lg font-medium text-foreground mb-2">Upload Foto Galeri</p>
+                    <p className="text-sm text-muted-foreground">
+                      {uploadingImage ? "Uploading..." : `Pilih beberapa foto (${galleryUrls.length}/10)`}
+                    </p>
+                  </div>
+                </label>
+              </div>
+
+              {galleryPreviews.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {galleryPreviews.map((preview, idx) => (
+                    <div key={idx} className="relative group">
+                      <img
+                        src={preview || "/placeholder.svg"}
+                        alt={`Gallery ${idx + 1}`}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(idx)}
+                        className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 

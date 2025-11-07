@@ -1,13 +1,11 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, Loader2 } from "lucide-react"
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -22,24 +20,26 @@ export default function AdminLoginPage() {
     setLoading(true)
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email, password }),
       })
 
-      const data = await response.json()
+      const data = await res.json()
 
-      if (!response.ok) {
+      if (!res.ok) {
         setError(data.error || "Login failed")
         return
       }
 
-      // Redirect to dashboard
+      // ✅ Langsung redirect (tanpa menyimpan apa pun di localStorage)
       router.push("/admin/dashboard")
     } catch (err) {
-      setError("An error occurred. Please try again.")
       console.error("[v0] Login error:", err)
+      setError("An unexpected error occurred. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -48,10 +48,12 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-accent/5 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <Link href="/" className="inline-block">
-              <h1 className="text-3xl font-serif font-bold text-primary">KuswantoProperty</h1>
+              <h1 className="text-3xl font-serif font-bold text-primary">
+                KuswantoProperty
+              </h1>
             </Link>
             <p className="text-muted-foreground mt-2">Admin Dashboard</p>
           </div>
@@ -59,7 +61,7 @@ export default function AdminLoginPage() {
           <form onSubmit={handleLogin} className="space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3 items-start">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
                 <p className="text-red-700 text-sm">{error}</p>
               </div>
             )}
@@ -91,17 +93,24 @@ export default function AdminLoginPage() {
               disabled={loading}
               className="w-full bg-primary text-primary-foreground hover:bg-accent"
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Logging in...
+                </span>
+              ) : (
+                "Login"
+              )}
             </Button>
           </form>
 
           <div className="mt-6 pt-6 border-t border-border text-center text-sm text-muted-foreground">
-            <p>Demo credentials for testing:</p>
+            {/* <p>Demo credentials for testing:</p>
             <p className="font-mono text-xs mt-2 bg-muted p-3 rounded">
               Email: admin@kuswantoproperty.com
               <br />
               Password: admin123
-            </p>
+            </p> */}
           </div>
         </div>
       </div>

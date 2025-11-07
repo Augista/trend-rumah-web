@@ -85,9 +85,11 @@ export default function Navigation() {
 
           {/* Right side - Login */}
           <div className="hidden md:flex items-center gap-4">
+          <Link href="/admin/login">
             <button className="px-6 py-2 text-primary border border-primary rounded-full hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium">
               Masuk
             </button>
+          </Link>
           </div>
 
           {/* Mobile menu button */}

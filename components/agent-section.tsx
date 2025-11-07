@@ -4,7 +4,6 @@ import { ArrowRight, Phone, Mail } from "lucide-react"
 export default function AgentSection() {
   const antoPhone = "+6281235749112"
   const antoEmail = "anto@propertisurabaya.com"
-  const whatsappNumber = "081235749112"
 
   return (
     <section className="py-16 md:py-32">
@@ -62,7 +61,7 @@ export default function AgentSection() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link
-                href={`https://wa.me/${whatsappNumber}`}
+                href={`https://wa.me/+6281235749112`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"

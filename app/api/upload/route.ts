@@ -1,55 +1,56 @@
-// import { createServerSupabaseClient } from "@/lib/supabase/server"
-// import { type NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
+import { createClient } from "@supabase/supabase-js"
 
-// export async function POST(request: NextRequest) {
-//   try {
-//     const supabase = await createServerSupabaseClient()
+export async function POST(request: NextRequest) {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-//     const {
-//       data: { user },
-//     } = await supabase.auth.getUser()
+    if (!supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json({ error: "Missing Supabase environment variables" }, { status: 500 })
+    }
 
-//     if (!user) {
-//       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-//     }
+    const supabase = createClient(supabaseUrl, serviceRoleKey)
 
-//     // Check admin status
-//     const { data: userProfile } = await supabase.from("users").select("is_admin").eq("id", user.id).single()
+    console.log("[v0] Upload API called")
 
-//     if (!userProfile?.is_admin) {
-//       return NextResponse.json({ error: "Admin access required" }, { status: 403 })
-//     }
+    const formData = await request.formData()
+    const file = formData.get("file") as File
 
-//     const formData = await request.formData()
-//     const file = formData.get("file") as File
+    if (!file) {
+      return NextResponse.json({ error: "No file provided" }, { status: 400 })
+    }
 
-//     if (!file) {
-//       return NextResponse.json({ error: "No file provided" }, { status: 400 })
-//     }
+    console.log("[v0] File:", file.name, file.size)
 
-//     const fileName = `${Date.now()}-${file.name}`
-//     const buffer = await file.arrayBuffer()
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name}`
+    const buffer = await file.arrayBuffer()
 
-//     // Upload to Supabase storage
-//     const { data, error } = await supabase.storage.from("properties").upload(fileName, buffer, {
-//       contentType: file.type,
-//     })
+    // Upload to Supabase storage using service role
+    const { data, error } = await supabase.storage.from("properties").upload(fileName, buffer, {
+      contentType: file.type,
+      upsert: false,
+    })
 
-//     if (error) {
-//       return NextResponse.json({ error: error.message }, { status: 400 })
-//     }
+    console.log("[v0] Upload result:", { data, error })
 
-//     // Get public URL
-//     const { data: urlData } = supabase.storage.from("properties").getPublicUrl(data.path)
+    if (error) {
+      console.error("[v0] Upload error:", error)
+      return NextResponse.json({ error: `Upload failed: ${error.message}` }, { status: 400 })
+    }
 
-//     return NextResponse.json({
-//       success: true,
-//       url: urlData.publicUrl,
-//     })
-//   } catch (error) {
-//     console.error("[v0] Upload error:", error)
-//     return NextResponse.json({ error: "Server error" }, { status: 500 })
-//   }
-// }
+    // Get public URL
+    const { data: urlData } = supabase.storage.from("properties").getPublicUrl(data.path)
 
-export {}
+    console.log("[v0] Public URL:", urlData.publicUrl)
+
+    return NextResponse.json({
+      success: true,
+      url: urlData.publicUrl,
+    })
+  } catch (error) {
+    console.error("[v0] Upload server error:", error)
+    const errorMsg = error instanceof Error ? error.message : "Unknown error"
+    return NextResponse.json({ error: `Server error: ${errorMsg}` }, { status: 500 })
+  }
+}

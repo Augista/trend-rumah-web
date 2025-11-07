@@ -11,7 +11,7 @@ import { ArrowLeft } from "lucide-react"
 
 const districts = ["Darmo", "Dinoyo", "Tegalsari", "Jambangan", "Wonokromo", "Sukolilo", "Tambaksari", "Genteng"]
 
-const propertyTypes = ["Rumah", "Apartemen", "Ruko", "Tanah"]
+const propertyTypes = ["Rumah", "Apartemen", "Ruko", "Tanah","Gudang"]
 
 export default function EditPropertyPage({ params }: { params: { id: string } }) {
   const router = useRouter()

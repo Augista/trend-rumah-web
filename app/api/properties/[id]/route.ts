@@ -1,132 +1,145 @@
-// import { createServerSupabaseClient } from "@/lib/supabase/server"
-// import { type NextRequest, NextResponse } from "next/server"
+import { supabaseAdmin } from "@/lib/supabase/admin"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { cookies } from "next/headers"
+import { type NextRequest, NextResponse } from "next/server"
 
-// // Get property by ID
-// export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-//   try {
-//     const supabase = await createServerSupabaseClient()
+type ParamsType = { params: { id: string } } | { params: Promise<{ id: string }> }
 
-//     const { data, error } = await supabase
-//       .from("properties")
-//       .select("*")
-//       .eq("id", params.id)
-//       .single()
+// ✅ GET /api/properties/[id]
+export async function GET(request: NextRequest, context: ParamsType) {
+  const params = "then" in context.params ? await context.params : context.params
 
-//     if (error) {
-//       return NextResponse.json({ error: "Property not found" }, { status: 404 })
-//     }
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("properties")
+      .select("*")
+      .eq("id", params.id)
+      .single()
 
-//     return NextResponse.json(data)
-//   } catch (error) {
-//     console.error("[v0] Get property error:", error)
-//     return NextResponse.json({ error: "Server error" }, { status: 500 })
-//   }
-// }
+    if (error || !data) {
+      return NextResponse.json({ error: "Property not found" }, { status: 404 })
+    }
 
-// // Update property by ID
-// export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-//   try {
-//     const supabase = await createServerSupabaseClient()
-//     const {
-//       data: { user },
-//     } = await supabase.auth.getUser()
+    return NextResponse.json(data)
+  } catch (error) {
+    console.error("[v0] Get property error:", error)
+    return NextResponse.json({ error: "Server error" }, { status: 500 })
+  }
+}
 
-//     if (!user) {
-//       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-//     }
+// ✅ PUT /api/properties/[id]
+export async function PUT(request: NextRequest, context: ParamsType) {
+  const params = "then" in context.params ? await context.params : context.params
 
-//     const { data: userProfile } = await supabase
-//       .from("users")
-//       .select("is_admin")
-//       .eq("id", user.id)
-//       .single()
+  try {
+    const cookieStore = await cookies()
+    const session = cookieStore.get("admin_session")?.value
 
-//     if (!userProfile?.is_admin) {
-//       return NextResponse.json({ error: "Admin access required" }, { status: 403 })
-//     }
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
 
-//     const body = await request.json()
-//     const {
-//       title,
-//       description,
-//       location,
-//       district,
-//       property_type,
-//       price,
-//       size_sqm,
-//       bedrooms,
-//       bathrooms,
-//       featured_image_url,
-//       amenities,
-//       contact_phone,
-//       contact_email,
-//     } = body
+    let admin
+    try {
+      admin = JSON.parse(session)
+    } catch {
+      return NextResponse.json({ error: "Invalid session" }, { status: 401 })
+    }
 
-//     const { data, error } = await supabase
-//       .from("properties")
-//       .update({
-//         title,
-//         description,
-//         location,
-//         district,
-//         property_type,
-//         price: Number(price),
-//         size_sqm: size_sqm ? Number(size_sqm) : null,
-//         bedrooms: bedrooms ? Number(bedrooms) : null,
-//         bathrooms: bathrooms ? Number(bathrooms) : null,
-//         featured_image_url,
-//         amenities,
-//         contact_phone,
-//         contact_email,
-//         updated_at: new Date().toISOString(),
-//       })
-//       .eq("id", params.id)
-//       .select()
+    // 🔹 Cek apakah admin valid
+    const { data: adminCheck, error: adminError } = await supabaseAdmin
+      .from("admin_users")
+      .select("id, email")
+      .eq("id", admin.id)
+      .single()
 
-//     if (error) {
-//       return NextResponse.json({ error: error.message }, { status: 400 })
-//     }
+    if (adminError || !adminCheck) {
+      return NextResponse.json({ error: "Admin access required" }, { status: 403 })
+    }
 
-//     return NextResponse.json(data[0])
-//   } catch (error) {
-//     console.error("[v0] Update property error:", error)
-//     return NextResponse.json({ error: "Server error" }, { status: 500 })
-//   }
-// }
+    // 🔹 Ambil data update dari body
+    const body = await request.json()
 
-// // Delete property by ID
-// export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-//   try {
-//     const supabase = await createServerSupabaseClient()
-//     const {
-//       data: { user },
-//     } = await supabase.auth.getUser()
+    const { data, error } = await supabaseAdmin
+      .from("properties")
+      .update({
+        title: body.title,
+        description: body.description,
+        location: body.location,
+        district: body.district,
+        property_type: body.property_type,
+        price: Number(body.price),
+        size_sqm: body.size_sqm ? Number(body.size_sqm) : null,
+        bedrooms: body.bedrooms ? Number(body.bedrooms) : null,
+        bathrooms: body.bathrooms ? Number(body.bathrooms) : null,
+        featured_image_url: body.featured_image_url,
+        gallery_images: body.gallery_images || [],
+        amenities: Array.isArray(body.amenities)
+          ? body.amenities
+          : body.amenities
+          ? [body.amenities]
+          : [],
+        contact_phone: body.contact_phone,
+        contact_email: body.contact_email,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", params.id)
+      .select()
 
-//     if (!user) {
-//       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-//     }
+    if (error) {
+      console.error("Update property error:", error)
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
 
-//     const { data: userProfile } = await supabase
-//       .from("users")
-//       .select("is_admin")
-//       .eq("id", user.id)
-//       .single()
+    return NextResponse.json(data[0])
+  } catch (error) {
+    console.error("[v0] Update property error:", error)
+    return NextResponse.json({ error: "Server error" }, { status: 500 })
+  }
+}
 
-//     if (!userProfile?.is_admin) {
-//       return NextResponse.json({ error: "Admin access required" }, { status: 403 })
-//     }
+// ✅ DELETE /api/properties/[id]
+export async function DELETE(request: NextRequest, context: ParamsType) {
+  const params = "then" in context.params ? await context.params : context.params
 
-//     const { error } = await supabase.from("properties").delete().eq("id", params.id)
+  try {
+    const cookieStore = await cookies()
+    const session = cookieStore.get("admin_session")?.value
 
-//     if (error) {
-//       return NextResponse.json({ error: error.message }, { status: 400 })
-//     }
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
 
-//     return NextResponse.json({ success: true })
-//   } catch (error) {
-//     console.error("[v0] Delete property error:", error)
-//     return NextResponse.json({ error: "Server error" }, { status: 500 })
-//   }
-// }
+    let admin
+    try {
+      admin = JSON.parse(session)
+    } catch {
+      return NextResponse.json({ error: "Invalid session" }, { status: 401 })
+    }
 
-export {}
+    const { data: adminCheck, error: adminError } = await supabaseAdmin
+      .from("admin_users")
+      .select("id, email")
+      .eq("id", admin.id)
+      .single()
+
+    if (adminError || !adminCheck) {
+      return NextResponse.json({ error: "Admin access required" }, { status: 403 })
+    }
+
+    const { error } = await supabaseAdmin
+      .from("properties")
+      .delete()
+      .eq("id", params.id)
+
+    if (error) {
+      console.error("Delete property error:", error)
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("[v0] Delete property error:", error)
+    return NextResponse.json({ error: "Server error" }, { status: 500 })
+  }
+}
