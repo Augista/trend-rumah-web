@@ -72,16 +72,16 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative h-screen md:h-96 overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage:
-              "url(/placeholder.svg?height=600&width=1200&query=luxury modern real estate property showcase)",
-            backgroundPosition: "center",
-          }}
-        >
-          <div className="absolute inset-0 bg-black/40"></div>
-        </div>
+      <div
+        className="absolute inset-0 bg-cover bg-center pointer-events-none"
+        style={{
+          backgroundImage:
+            "url(/placeholder.svg?height=600&width=1200&query=luxury modern real estate property showcase)",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/40"></div>
+      </div>
 
         <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
           <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-4 text-balance">
@@ -170,15 +170,15 @@ export default function HomePage() {
 
       <section className="relative h-96 max-md:h-[400px] md:h-[800px] overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: "url(/OMANTO2.jpeg)",
-            backgroundPosition: "center right",
-          }}
-        >
-          <div className="absolute inset-0 bg-black/30"></div>
-        </div>
-
+        className="absolute inset-0 bg-cover bg-center pointer-events-none"
+        style={{
+          backgroundImage: "url(/OMANTO2.jpeg)",
+          backgroundPosition: "center right",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/30"></div>
+      </div>
+      
         <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6 text-balance">
             Bekerja Bersama Anto

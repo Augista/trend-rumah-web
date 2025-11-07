@@ -127,9 +127,11 @@ export default function Navigation() {
             <a href="#contact" className="block text-foreground hover:text-primary py-2 text-sm">
               Kontak
             </a>
-            <button className="w-full px-4 py-2 text-primary border border-primary rounded-full hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium">
+          <Link href="/admin/login">
+            <button className="px-6 py-2 text-primary border border-primary rounded-full hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium">
               Masuk
             </button>
+          </Link>
           </div>
         )}
       </div>
